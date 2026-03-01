@@ -1,0 +1,16 @@
+name = "asura-tracker"
+compatibility_date = "2024-12-01"
+pages_build_output_dir = "./dist"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "asura-tracker-db"
+database_id = "local"
+
+[vars]
+RESEND_API_KEY = ""
+NOTIFICATION_EMAIL = ""
+ASURA_API_BASE = "https://api.asurascans.com"
+
+[triggers]
+crons = ["0 * * * *"]
