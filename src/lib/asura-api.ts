@@ -31,9 +31,10 @@ interface SeriesListResponse {
 }
 
 const API_BASE = 'https://api.asurascans.com';
+const HEADERS = { 'User-Agent': 'AsuraTracker/1.0' };
 
 export async function fetchSeriesPage(page: number = 1): Promise<SeriesListResponse> {
-  const res = await fetch(`${API_BASE}/api/series?page=${page}`);
+  const res = await fetch(`${API_BASE}/api/series?page=${page}`, { headers: HEADERS });
   if (!res.ok) throw new Error(`AsuraScans API error: ${res.status}`);
   return res.json();
 }
@@ -56,7 +57,7 @@ export async function fetchAllSeries(): Promise<AsuraSeries[]> {
 }
 
 export async function fetchSeriesChapters(slug: string): Promise<AsuraChapter[]> {
-  const res = await fetch(`${API_BASE}/api/series/${slug}/chapters`);
+  const res = await fetch(`${API_BASE}/api/series/${slug}/chapters`, { headers: HEADERS });
   if (!res.ok) throw new Error(`AsuraScans API error: ${res.status}`);
   const data = await res.json();
   return data.data;
