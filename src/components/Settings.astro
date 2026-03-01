@@ -1,0 +1,92 @@
+<details class="settings">
+  <summary>Settings</summary>
+  <form id="settings-form">
+    <div class="field">
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email" placeholder="your@email.com" required />
+    </div>
+    <div class="field">
+      <label for="schedule">Check Schedule</label>
+      <select id="schedule" name="check_schedule">
+        <option value="hourly">Every hour</option>
+        <option value="00:00">12:00 AM</option>
+        <option value="06:00">6:00 AM</option>
+        <option value="09:00">9:00 AM</option>
+        <option value="12:00">12:00 PM</option>
+        <option value="15:00">3:00 PM</option>
+        <option value="18:00">6:00 PM</option>
+        <option value="21:00">9:00 PM</option>
+      </select>
+    </div>
+    <button type="submit">Save</button>
+  </form>
+</details>
+
+<style>
+  .settings {
+    background: #16161e;
+    border-radius: 8px;
+    padding: 1rem;
+  }
+  summary {
+    cursor: pointer;
+    color: #a855f7;
+    font-weight: 600;
+  }
+  form {
+    margin-top: 1rem;
+    display: flex;
+    gap: 1rem;
+    align-items: end;
+    flex-wrap: wrap;
+  }
+  .field { display: flex; flex-direction: column; gap: 0.25rem; }
+  label { font-size: 0.8rem; color: #888; }
+  input, select {
+    padding: 0.5rem 0.75rem;
+    background: #0a0a0f;
+    border: 1px solid #2a2a3e;
+    border-radius: 6px;
+    color: #e0e0e0;
+    font-size: 0.9rem;
+  }
+  input:focus, select:focus { border-color: #a855f7; outline: none; }
+  button {
+    padding: 0.5rem 1.5rem;
+    background: #a855f7;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+  }
+  button:hover { background: #9333ea; }
+</style>
+
+<script>
+  const form = document.getElementById('settings-form') as HTMLFormElement;
+
+  // Load current settings
+  fetch('/api/settings')
+    .then(r => r.json())
+    .then(data => {
+      if (data) {
+        (document.getElementById('email') as HTMLInputElement).value = data.email ?? '';
+        (document.getElementById('schedule') as HTMLSelectElement).value = data.check_schedule ?? 'hourly';
+      }
+    });
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const formData = new FormData(form);
+    await fetch('/api/settings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: formData.get('email'),
+        check_schedule: formData.get('check_schedule'),
+      }),
+    });
+    alert('Settings saved!');
+  });
+</script>

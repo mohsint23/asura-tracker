@@ -1,0 +1,118 @@
+---
+interface Props {
+  id: number;
+  title: string;
+  cover: string | null;
+  latestChapter: number;
+  subscribed: boolean;
+}
+const { id, title, cover, latestChapter, subscribed } = Astro.props;
+---
+
+<div class="card" data-title={title.toLowerCase()} data-series-id={id}>
+  <div class="cover">
+    {cover ? <img src={cover} alt={title} loading="lazy" /> : <div class="no-cover" />}
+    <span class="chapter-badge">Ch. {latestChapter}</span>
+  </div>
+  <div class="info">
+    <span class="title">{title}</span>
+    <label class="toggle">
+      <input type="checkbox" checked={subscribed} data-series-id={id} />
+      <span class="slider"></span>
+    </label>
+  </div>
+</div>
+
+<style>
+  .card {
+    background: #16161e;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: transform 0.15s;
+  }
+  .card:hover { transform: translateY(-2px); }
+
+  .cover {
+    position: relative;
+    aspect-ratio: 3/4;
+    overflow: hidden;
+  }
+  .cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .no-cover {
+    width: 100%;
+    height: 100%;
+    background: #2a2a3e;
+  }
+  .chapter-badge {
+    position: absolute;
+    bottom: 6px;
+    right: 6px;
+    background: rgba(0,0,0,0.8);
+    color: #a855f7;
+    font-size: 0.75rem;
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+
+  .info {
+    padding: 0.75rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .title {
+    font-size: 0.85rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1;
+  }
+
+  .toggle {
+    position: relative;
+    width: 40px;
+    height: 22px;
+    flex-shrink: 0;
+  }
+  .toggle input { opacity: 0; width: 0; height: 0; }
+  .slider {
+    position: absolute;
+    inset: 0;
+    background: #333;
+    border-radius: 11px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .slider::before {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    left: 3px;
+    bottom: 3px;
+    background: #e0e0e0;
+    border-radius: 50%;
+    transition: transform 0.2s;
+  }
+  .toggle input:checked + .slider { background: #a855f7; }
+  .toggle input:checked + .slider::before { transform: translateX(18px); }
+</style>
+
+<script>
+  document.querySelectorAll('.toggle input').forEach(input => {
+    input.addEventListener('change', async (e) => {
+      const el = e.target as HTMLInputElement;
+      const seriesId = parseInt(el.dataset.seriesId!);
+      await fetch('/api/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ series_id: seriesId, subscribed: el.checked }),
+      });
+    });
+  });
+</script>
