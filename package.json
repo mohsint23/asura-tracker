@@ -6,7 +6,9 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "seed:generate": "npx tsx scripts/seed-series.ts > seed.sql",
+    "seed:apply": "npx wrangler d1 execute asura-tracker-db --local --file=seed.sql"
   },
   "dependencies": {
     "@astrojs/cloudflare": "^12.6.12",
@@ -15,6 +17,7 @@
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20260305.0",
+    "tsx": "^4.21.0",
     "wrangler": "^4.69.0"
   }
 }
