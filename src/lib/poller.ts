@@ -20,15 +20,15 @@ export async function pollForUpdates(db: D1Database, env: { RESEND_API_KEY: stri
 
   // Get all tracked series from DB
   const tracked = await db.prepare(
-    'SELECT id, asura_id, slug, title, latest_chapter FROM series'
-  ).all<{ id: number; asura_id: number; slug: string; title: string; latest_chapter: number }>();
+    'SELECT id, asura_id, slug, title, latest_chapter, cover_url FROM series'
+  ).all<{ id: number; asura_id: number; slug: string; title: string; latest_chapter: number; cover_url: string | null }>();
 
   if (!tracked.results || tracked.results.length === 0) return result;
 
   const trackedMap = new Map(tracked.results.map(s => [s.asura_id, s]));
 
   // Find updates
-  const updates: { seriesTitle: string; chapterNumber: number; readUrl: string; dbSeriesId: number; }[] = [];
+  const updates: { seriesTitle: string; chapterNumber: number; readUrl: string; coverUrl?: string; dbSeriesId: number; }[] = [];
 
   for (const apiSeries of recentSeries) {
     const dbSeries = trackedMap.get(apiSeries.id);
@@ -42,6 +42,7 @@ export async function pollForUpdates(db: D1Database, env: { RESEND_API_KEY: stri
         seriesTitle: dbSeries.title,
         chapterNumber: latestChapter.number,
         readUrl: `https://asurascans.com${apiSeries.public_url}`,
+        coverUrl: dbSeries.cover_url ?? undefined,
         dbSeriesId: dbSeries.id,
       });
 

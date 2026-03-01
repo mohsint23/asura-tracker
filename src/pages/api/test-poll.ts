@@ -17,11 +17,11 @@ export const POST: APIRoute = async ({ locals }) => {
 
   // Get a random subscribed series to fake an update
   const sub = await db.prepare(`
-    SELECT s.title, s.latest_chapter FROM series s
+    SELECT s.title, s.latest_chapter, s.cover_url, s.slug FROM series s
     INNER JOIN subscriptions sub ON sub.series_id = s.id
     WHERE sub.user_id = 1
     ORDER BY RANDOM() LIMIT 1
-  `).first<{ title: string; latest_chapter: number }>();
+  `).first<{ title: string; latest_chapter: number; cover_url: string | null; slug: string }>();
 
   if (!sub) {
     return new Response(JSON.stringify({ error: 'Subscribe to at least one series first' }), {
@@ -40,7 +40,8 @@ export const POST: APIRoute = async ({ locals }) => {
       [{
         seriesTitle: sub.title,
         chapterNumber: fakeChapter,
-        readUrl: 'https://asurascans.com',
+        readUrl: `https://asurascans.com/comics/${sub.slug}`,
+        coverUrl: sub.cover_url ?? undefined,
       }]
     );
   } catch (err: any) {
