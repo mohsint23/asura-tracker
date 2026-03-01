@@ -40,6 +40,54 @@ Open http://localhost:4321 — enter your email in Settings, toggle series on, a
 4. If new chapters are found, sends **batched email** to all subscribed users
 5. Updates stored chapter numbers in DB
 
+## Suggested UX for Asura Scans
+
+### Series Page — Notification Bell
+
+Add a notification bell icon on each series page, in the header area next to the series title (top-right). When a logged-in user clicks it, they subscribe to email notifications for that series. The bell toggles between outlined (unsubscribed) and filled/purple (subscribed).
+
+```
+┌─────────────────────────────────────────────────┐
+│  [Cover]    Nano Machine                   🔔   │
+│             RANK #2 · 나노마신 · ...              │
+│                                                  │
+│             Nanotechnology meets martial arts...  │
+└─────────────────────────────────────────────────┘
+```
+
+This is the primary way users subscribe — one tap from the series they're already reading.
+
+The bell icon calls `POST /api/subscribe` with `{ series_id, subscribed: true/false }` and requires the user's JWT token for auth.
+
+### Settings Page — Notification Preferences
+
+Add an "Email Notifications" section to the existing user settings page with:
+
+1. **Toggle** — Master on/off switch for all email notifications
+2. **Email field** — Pre-filled from their account email, editable
+3. **Schedule picker** — "Every hour" (default), or a specific time like "6:00 PM"
+4. **Series picker** — A searchable dropdown that shows all series the user is subscribed to, with checkboxes to enable/disable notifications per series. This lets users bulk-manage their subscriptions without visiting each series page individually.
+
+```
+┌─ Email Notifications ──────────────────────────┐
+│  ● Enabled                                      │
+│                                                  │
+│  Email:     mohsin@example.com                   │
+│  Schedule:  [Every hour ▾]                       │
+│                                                  │
+│  Notify me for:                                  │
+│  ┌─ Search series... ────────────────────┐      │
+│  │  ☑ Nano Machine                        │      │
+│  │  ☑ Solo Max-Level Newbie               │      │
+│  │  ☑ Overgeared                          │      │
+│  │  ☐ The Last Adventurer                 │      │
+│  │  ☐ Breakers                            │      │
+│  └────────────────────────────────────────┘      │
+│                                                  │
+│  [Save]                                          │
+└──────────────────────────────────────────────────┘
+```
+
 ## Integration with Asura Scans
 
 This is built as a standalone microservice that can be absorbed into the asurascans.com platform. Here's how:
