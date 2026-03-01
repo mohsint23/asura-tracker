@@ -29,6 +29,8 @@ const { id, title, cover, latestChapter, subscribed } = Astro.props;
     border-radius: 8px;
     overflow: hidden;
     transition: transform 0.15s;
+    display: flex;
+    flex-direction: column;
   }
   .card:hover { transform: translateY(-2px); }
 
@@ -36,6 +38,7 @@ const { id, title, cover, latestChapter, subscribed } = Astro.props;
     position: relative;
     aspect-ratio: 3/4;
     overflow: hidden;
+    flex-shrink: 0;
   }
   .cover img {
     width: 100%;
@@ -64,6 +67,8 @@ const { id, title, cover, latestChapter, subscribed } = Astro.props;
     justify-content: space-between;
     align-items: center;
     gap: 0.5rem;
+    flex-shrink: 0;
+    min-height: 46px;
   }
   .title {
     font-size: 0.85rem;
