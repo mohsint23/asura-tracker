@@ -1,5 +1,3 @@
-import { Resend } from 'resend';
-
 interface ChapterUpdate {
   seriesTitle: string;
   chapterNumber: number;
@@ -84,6 +82,69 @@ function buildHtml(updates: ChapterUpdate[]): string {
 </html>`;
 }
 
+// --- Email Provider Interface ---
+// Swap the implementation below when switching providers.
+// Currently supports: MailChannels (via Cloudflare Workers) and Resend (paid fallback).
+
+interface EmailProvider {
+  send(options: {
+    from: string;
+    to: string;
+    subject: string;
+    html: string;
+    text: string;
+  }): Promise<void>;
+}
+
+// MailChannels — free, unlimited, requires custom domain with SPF/DKIM
+// Sends via Cloudflare Workers' built-in MailChannels integration
+function mailChannelsProvider(): EmailProvider {
+  return {
+    async send({ from, to, subject, html, text }) {
+      const res = await fetch('https://api.mailchannels.net/tx/v1/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          personalizations: [{ to: [{ email: to }] }],
+          from: { email: from },
+          subject,
+          content: [
+            { type: 'text/plain', value: text },
+            { type: 'text/html', value: html },
+          ],
+        }),
+      });
+      if (!res.ok) {
+        const body = await res.text();
+        throw new Error(`MailChannels error ${res.status}: ${body}`);
+      }
+    },
+  };
+}
+
+// Resend — paid fallback (3k free/month), no domain needed
+// Uncomment and install `resend` package to use:
+//
+// import { Resend } from 'resend';
+// function resendProvider(apiKey: string): EmailProvider {
+//   const resend = new Resend(apiKey);
+//   return {
+//     async send({ from, to, subject, html, text }) {
+//       await resend.emails.send({ from, to, subject, html, text });
+//     },
+//   };
+// }
+
+// --- Active provider ---
+// Change this to switch email backends
+function getProvider(_env: { RESEND_API_KEY?: string }): EmailProvider {
+  // Default: MailChannels (free, requires domain DNS setup)
+  return mailChannelsProvider();
+
+  // Fallback: Resend (uncomment to use, requires RESEND_API_KEY)
+  // return resendProvider(env.RESEND_API_KEY!);
+}
+
 export async function sendUpdateEmail(
   apiKey: string,
   fromEmail: string,
@@ -92,7 +153,7 @@ export async function sendUpdateEmail(
 ): Promise<void> {
   if (updates.length === 0) return;
 
-  const resend = new Resend(apiKey);
+  const provider = getProvider({ RESEND_API_KEY: apiKey });
 
   const subject = updates.length === 1
     ? `New Chapter: ${updates[0].seriesTitle} Ch. ${updates[0].chapterNumber}`
@@ -102,7 +163,7 @@ export async function sendUpdateEmail(
     .map(u => `${u.seriesTitle} — Chapter ${u.chapterNumber}\n${u.readUrl}`)
     .join('\n\n');
 
-  await resend.emails.send({
+  await provider.send({
     from: fromEmail,
     to: toEmail,
     subject,

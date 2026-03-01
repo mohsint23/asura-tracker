@@ -9,16 +9,13 @@ Built with the same stack as asurascans.com — designed to plug directly into t
 - **Astro 5** (SSR) — matches asurascans.com frontend
 - **Cloudflare Pages + D1** — hosting + SQLite database
 - **Cloudflare Scheduled Workers** — hourly cron for polling
-- **Resend** — email delivery (free tier: 3k emails/month)
+- **MailChannels** — free unlimited email delivery via Cloudflare Workers (no API key needed)
 
 ## Quick Start
 
 ```bash
 # Install dependencies
 npm install
-
-# Copy env template and add your Resend API key
-cp .dev.vars.example .dev.vars
 
 # Create local database
 npx wrangler d1 execute asura-tracker-db --local --file=schema.sql
@@ -31,6 +28,52 @@ npx astro dev
 ```
 
 Open http://localhost:4321 — enter your email in Settings, toggle series on, and click "Send Test Email" to verify.
+
+## Email Setup (MailChannels)
+
+MailChannels sends email for free through Cloudflare Workers — no API keys, no monthly limits. You just need a custom domain with DNS records.
+
+### 1. Add SPF record
+
+Add a TXT record to your domain's DNS:
+
+```
+Type:  TXT
+Name:  @
+Value: v=spf1 a mx include:relay.mailchannels.net ~all
+```
+
+### 2. Add Domain Lockdown TXT record
+
+This tells MailChannels your Cloudflare Worker is authorized to send from your domain:
+
+```
+Type:  TXT
+Name:  _mailchannels
+Value: v=mc1 cfid=your-account.workers.dev
+```
+
+Replace `your-account` with your Cloudflare Workers subdomain (find it in Cloudflare dashboard > Workers & Pages > Overview).
+
+### 3. (Optional) Add DKIM
+
+For better deliverability, generate a DKIM key pair and add the public key as a TXT record. See [MailChannels DKIM docs](https://support.mailchannels.com/hc/en-us/articles/7122849237389).
+
+### 4. Update NOTIFICATION_EMAIL
+
+Set `NOTIFICATION_EMAIL` in `.dev.vars` to an address on your domain:
+
+```
+NOTIFICATION_EMAIL=notifications@yourdomain.com
+```
+
+### No domain yet?
+
+If you don't have a domain, you can temporarily switch back to Resend (3k free emails/month):
+
+1. `npm install resend`
+2. In `src/lib/notify.ts`, uncomment the `resendProvider` and swap `getProvider()` to use it
+3. Set `RESEND_API_KEY` in `.dev.vars`
 
 ## How It Works
 
