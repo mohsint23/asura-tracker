@@ -5,6 +5,8 @@ CREATE TABLE IF NOT EXISTS users (
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
+INSERT OR IGNORE INTO users (id, email, check_schedule) VALUES (1, 'placeholder@example.com', 'hourly');
+
 CREATE TABLE IF NOT EXISTS series (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   asura_id INTEGER NOT NULL UNIQUE,
