@@ -16,6 +16,7 @@ pnpm-debug.log*
 # environment variables
 .env
 .env.production
+.dev.vars
 
 # macOS-specific files
 .DS_Store
@@ -29,8 +30,9 @@ pnpm-debug.log*
 # wrangler local state
 .wrangler/
 
-# generated seed file
+# generated seed files
 seed.sql
+seed_browse.sql
 
 # claude code
 .claude/

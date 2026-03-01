@@ -8,9 +8,10 @@ database_name = "asura-tracker-db"
 database_id = "local"
 
 [vars]
-RESEND_API_KEY = ""
-NOTIFICATION_EMAIL = ""
 ASURA_API_BASE = "https://api.asurascans.com"
+
+# RESEND_API_KEY and NOTIFICATION_EMAIL are loaded from .env locally
+# and set via `wrangler secret put` in production
 
 [triggers]
 crons = ["0 * * * *"]
