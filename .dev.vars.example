@@ -1,2 +1,5 @@
-RESEND_API_KEY=re_your_api_key_here
-NOTIFICATION_EMAIL=onboarding@resend.dev
+# Email sender address (use your custom domain for MailChannels)
+NOTIFICATION_EMAIL=notifications@yourdomain.com
+
+# Only needed if using Resend as fallback (see README)
+# RESEND_API_KEY=re_your_api_key_here

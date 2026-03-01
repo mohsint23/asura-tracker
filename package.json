@@ -12,8 +12,7 @@
   },
   "dependencies": {
     "@astrojs/cloudflare": "^12.6.12",
-    "astro": "^5.17.1",
-    "resend": "^6.9.3"
+    "astro": "^5.17.1"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20260305.0",

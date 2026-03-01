@@ -10,7 +10,7 @@ database_id = "local"
 [vars]
 ASURA_API_BASE = "https://api.asurascans.com"
 
-# RESEND_API_KEY and NOTIFICATION_EMAIL are loaded from .env locally
+# NOTIFICATION_EMAIL is loaded from .dev.vars locally
 # and set via `wrangler secret put` in production
 
 [triggers]
