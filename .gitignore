@@ -22,3 +22,15 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# vscode
+.vscode/
+
+# wrangler local state
+.wrangler/
+
+# generated seed file
+seed.sql
+
+# claude code
+.claude/
