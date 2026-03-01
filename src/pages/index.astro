@@ -1,17 +1,41 @@
 ---
+import Layout from '../layouts/Layout.astro';
+import Settings from '../components/Settings.astro';
+import SearchBar from '../components/SearchBar.astro';
+import SeriesCard from '../components/SeriesCard.astro';
+import { getDb } from '../lib/db';
 
+const db = getDb(Astro.locals);
+const series = await db.prepare(`
+  SELECT s.*,
+    CASE WHEN sub.id IS NOT NULL THEN 1 ELSE 0 END as subscribed
+  FROM series s
+  LEFT JOIN subscriptions sub ON sub.series_id = s.id AND sub.user_id = 1
+  ORDER BY s.title ASC
+`).all();
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<Layout title="AsuraTracker">
+  <Settings />
+  <SearchBar />
+  <div class="series-grid" id="series-grid">
+    {series.results?.map((s: any) => (
+      <SeriesCard
+        id={s.id}
+        title={s.title}
+        cover={s.cover_url}
+        latestChapter={s.latest_chapter}
+        subscribed={!!s.subscribed}
+      />
+    ))}
+  </div>
+</Layout>
+
+<style>
+  .series-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+  }
+</style>
