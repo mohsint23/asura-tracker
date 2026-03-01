@@ -19,6 +19,7 @@
       </select>
     </div>
     <button type="submit">Save</button>
+    <button type="button" id="test-btn">Send Test Email</button>
   </form>
 </details>
 
@@ -61,6 +62,10 @@
     font-size: 0.9rem;
   }
   button:hover { background: #9333ea; }
+  #test-btn {
+    background: #1e3a5f;
+  }
+  #test-btn:hover { background: #2563eb; }
 </style>
 
 <script>
@@ -88,5 +93,25 @@
       }),
     });
     alert('Settings saved!');
+  });
+
+  document.getElementById('test-btn')!.addEventListener('click', async () => {
+    const btn = document.getElementById('test-btn') as HTMLButtonElement;
+    btn.disabled = true;
+    btn.textContent = 'Sending...';
+    try {
+      const res = await fetch('/api/test-poll', { method: 'POST' });
+      const data = await res.json();
+      if (data.ok) {
+        alert(`Test email sent to ${data.message.replace('Test email sent to ', '')}!\nSeries: ${data.series} Ch. ${data.fakeChapter}`);
+      } else {
+        alert(`Error: ${data.error}`);
+      }
+    } catch (err: any) {
+      alert(`Failed: ${err.message}`);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Send Test Email';
+    }
   });
 </script>
