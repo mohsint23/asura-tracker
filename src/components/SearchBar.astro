@@ -1,0 +1,32 @@
+<div class="search-bar">
+  <input type="text" id="search-input" placeholder="Search series..." />
+</div>
+
+<style>
+  .search-bar { margin-top: 1rem; }
+  input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background: #16161e;
+    border: 1px solid #2a2a3e;
+    border-radius: 8px;
+    color: #e0e0e0;
+    font-size: 1rem;
+    outline: none;
+  }
+  input:focus { border-color: #a855f7; }
+  input::placeholder { color: #666; }
+</style>
+
+<script>
+  const input = document.getElementById('search-input') as HTMLInputElement;
+  const grid = document.getElementById('series-grid')!;
+
+  input.addEventListener('input', () => {
+    const query = input.value.toLowerCase();
+    grid.querySelectorAll('.card').forEach(card => {
+      const title = (card as HTMLElement).dataset.title ?? '';
+      (card as HTMLElement).style.display = title.includes(query) ? '' : 'none';
+    });
+  });
+</script>
